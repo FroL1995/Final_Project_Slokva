@@ -1,0 +1,20 @@
+.venv/
+.idea/
+
+# venv
+.venv
+.env
+
+# python
+__pycache__
+
+# database
+*.db
+*.sqlite
+*.sqlite3
+
+# file
+*.json
+*.jpeg
+*.png
+++
