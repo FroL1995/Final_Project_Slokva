@@ -4,7 +4,7 @@ import logging
 from aiogram import Bot, Dispatcher
 from aiogram.types import BotCommand, BotCommandScopeDefault
 from db.database import Database  # Убедитесь, что у вас есть эта модель для работы с БД
-from handlers import router  # Подключаем роутер для обработки сообщений
+from handlers import router# Подключаем роутер для обработки сообщений
 import config  # Ваши настройки конфигурации
 
 # Инициализация бота и диспетчера
@@ -26,7 +26,7 @@ async def set_commands():
     ]
 
 
-    # Устанавливаем команды для всех пользователей
+# Устанавливаем команды для всех пользователей
     await bot.set_my_commands(commands, BotCommandScopeDefault())
 
 
@@ -61,3 +61,4 @@ if __name__ == "__main__":
         asyncio.run(main())  # Запуск основной асинхронной функции
     except KeyboardInterrupt:
         print("Бот завершил работу.")
+

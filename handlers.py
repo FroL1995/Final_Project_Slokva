@@ -1,7 +1,6 @@
 import typing
 from functools import wraps
 
-import requests
 from aiogram import F, Router
 from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
@@ -59,6 +58,7 @@ async def cmd_help(message: Message):
         reply_markup=keyboards.main_menu(),
     )
 
+
 @router.message(Command("history"))
 @router.message(F.text == "История поиска")
 @login_required
@@ -69,14 +69,15 @@ async def cmd_history(message: Message):
         history = f"{i}: {r.title}. {r.timestamp.strftime('%d.%m.%Y %H:%M:%S')}"
         histories.append(history)
 
-    msg = f"История запросов:\n{'\n'.join(h for h in histories)}"
-    await message.answer(msg)
+    title = "История запросов:\n"
+    await message.answer(title + '\n'.join(histories))
+
 
 @router.message(Command("favorites"))
 @router.message(F.text == "Избранное")
 @login_required
 async def cmd_favorites(message: Message):
-    req_favorites =Database.get_favorites(message.from_user.username, count=20)
+    req_favorites = Database.get_favorites(message.from_user.username, count=20)
     if not req_favorites:
         await message.answer("У вас пока нет избранных игр!")
         return
@@ -96,8 +97,11 @@ async def cmd_delete_favorite(message: Message, state: FSMContext):
 
 @router.message(RemoveFavorite.title)
 @login_required
-async def cmd_delete_favorite(message: Message, state: FSMContext):
-    favorite =Database.remove_from_favorites(message.from_user.username, message.text)
+async def cmd_delete_favorite_step_2(message: Message, state: FSMContext):
+    favorite = Database.remove_from_favorites(
+        message.from_user.username,
+        message.text,
+    )
     await state.clear()
     if not favorite:
         await message.answer(f"Игра {message.text} не находится в избранном!")
@@ -119,13 +123,14 @@ async def cmd_search(message: Message, state: FSMContext):
 @login_required
 async def cmd_add_favorite(message: Message, state: FSMContext):
     await state.set_state(AddFavorite.title)
-    await message.answer(f"Введите название игры!")
+    await message.answer("Введите название игры!")
+
 
 @router.message(AddFavorite.title)
 @login_required
-async def cmd_add_favorite(message: Message, state: FSMContext):
+async def cmd_add_favorite_step_2(message: Message, state: FSMContext):
     Database.add_to_favorites(message.from_user.username, message.text)
-    await message.answer(f"Игра добавлена в избранное!")
+    await message.answer("Игра добавлена в избранное!")
 
 
 @router.message(Search.title)
@@ -135,7 +140,9 @@ async def search_games(message: Message, state: FSMContext):
     Database.create_request_history(message.text, message.from_user.username)
 
     if not response:
-        await message.answer(f"Простите, не нашел игр с таким названием - {message.text}")
+        await message.answer(
+            f"Простите, не нашел игр с таким названием - {message.text}"
+        )
         return
 
     # Отображаем данные первых 10 игр
@@ -148,5 +155,3 @@ async def search_games(message: Message, state: FSMContext):
     text = f"\n*{'-' * delimiter}*\n".join(games)
     await state.clear()
     await message.answer(text)
-
-

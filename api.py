@@ -17,7 +17,6 @@ async def request_api(
         headers = {
             "Accept": "application/json",
             "Content-Type": "application/json",
-            "x-rapidapi-ua": "RapidAPI - Playground",
             "x-rapidapi-key": STEAM_API_KEY,
             "x-rapidapi-host": "steam2.p.rapidapi.com",
         }
@@ -43,6 +42,7 @@ async def search_games(term: str, page: int) -> List[Dict[str, Any]]:
     """Поиск игр по ключевому слову."""
     url = f"{API_BASE_URL}/search/{term}/page/{page}"
     result = await request_api(url)
+    print(result)
 
     games = []
     if not result:
